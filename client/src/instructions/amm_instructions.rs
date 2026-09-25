@@ -17,6 +17,7 @@ use std::rc::Rc;
 
 use super::super::{read_keypair_file, ClientConfig};
 
+#[allow(clippy::too_many_arguments)]
 pub fn initialize_pool_instr(
     config: &ClientConfig,
     token_0_mint: Pubkey,
@@ -43,8 +44,8 @@ pub fn initialize_pool_instr(
         &program.id(),
     );
 
-    let pool_account_key = if random_pool_id.is_some() {
-        random_pool_id.unwrap()
+    let pool_account_key = if let Some(random_pool_id) = random_pool_id {
+        random_pool_id
     } else {
         Pubkey::find_program_address(
             &[
@@ -123,10 +124,10 @@ pub fn initialize_pool_instr(
             open_time,
         })
         .instructions();
-    if random_pool_id.is_some() {
+    if let Some(random_pool_id) = random_pool_id {
         // update account signer as true for random pool
         for account in instructions[0].accounts.iter_mut() {
-            if account.pubkey == random_pool_id.unwrap() {
+            if account.pubkey == random_pool_id {
                 account.is_signer = true;
                 break;
             }
@@ -135,6 +136,7 @@ pub fn initialize_pool_instr(
     Ok(instructions)
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn deposit_instr(
     config: &ClientConfig,
     pool_id: Pubkey,
@@ -184,6 +186,7 @@ pub fn deposit_instr(
     Ok(instructions)
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn withdraw_instr(
     config: &ClientConfig,
     pool_id: Pubkey,
@@ -234,6 +237,7 @@ pub fn withdraw_instr(
     Ok(instructions)
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn swap_base_input_instr(
     config: &ClientConfig,
     pool_id: Pubkey,
@@ -283,6 +287,7 @@ pub fn swap_base_input_instr(
     Ok(instructions)
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn swap_base_output_instr(
     config: &ClientConfig,
     pool_id: Pubkey,

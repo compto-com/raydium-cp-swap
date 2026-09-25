@@ -8,7 +8,6 @@ import {
   Signer,
   SystemProgram,
   SYSVAR_RENT_PUBKEY,
-  ComputeBudgetProgram,
 } from "@solana/web3.js";
 import {
   TOKEN_PROGRAM_ID,
@@ -154,6 +153,9 @@ export async function setupDepositTest(
       );
     }
   }
+  throw new Error(
+    "Unreachable code: setupDepositTest failed to create a pool with the required token programs"
+  );
 }
 
 export async function setupSwapTest(
@@ -299,7 +301,7 @@ export async function initialize(
     token1,
     program.programId
   );
-  const [creatorLpTokenAddress] = await PublicKey.findProgramAddress(
+  const [creatorLpTokenAddress] = PublicKey.findProgramAddressSync(
     [
       creator.publicKey.toBuffer(),
       TOKEN_PROGRAM_ID.toBuffer(),

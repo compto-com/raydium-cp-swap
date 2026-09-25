@@ -1,4 +1,5 @@
 {
+    "type": "module",
     "scripts": {
         "test:local-admin": "CPSWAP_LOCALNET_ADMIN=$(solana-keygen pubkey ${ANCHOR_WALLET:-$HOME/.config/solana/id.json}) sh -c 'anchor build --ignore-keys -- --features localnet && anchor test --skip-build'",
         "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",

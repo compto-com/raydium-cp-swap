@@ -41,6 +41,7 @@ pub fn transfer_from_user_to_pool_vault<'a>(
     )
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn transfer_from_pool_vault_to_user<'a>(
     authority: AccountInfo<'a>,
     from_vault: AccountInfo<'a>,
@@ -180,10 +181,10 @@ pub fn unwrap_lamports<'a>(
 fn token_account_native_and_amount(account: &AccountInfo) -> Result<(bool, u64)> {
     let data = account.try_borrow_data()?;
     if let Ok(state) = StateWithExtensions::<spl_token_2022::state::Account>::unpack(&data) {
-        return Ok((state.base.is_native.is_some(), state.base.amount));
+        Ok((state.base.is_native.is_some(), state.base.amount))
     } else {
         // process token mint account
-        return Ok((false, 0));
+        Ok((false, 0))
     }
 }
 
@@ -307,7 +308,7 @@ pub fn support_mint_associated_is_initialized(
     remaining_accounts: &[AccountInfo],
     token_mint: &InterfaceAccount<Mint>,
 ) -> Result<bool> {
-    if remaining_accounts.len() == 0 {
+    if remaining_accounts.is_empty() {
         return Ok(false);
     }
     let (expect_mint_associated, __bump) = Pubkey::find_program_address(
@@ -315,7 +316,7 @@ pub fn support_mint_associated_is_initialized(
         &crate::id(),
     );
     let mut mint_associated_is_initialized = false;
-    for mint_associated_info in remaining_accounts.into_iter() {
+    for mint_associated_info in remaining_accounts.iter() {
         if *mint_associated_info.owner != crate::id()
             || mint_associated_info.key() != expect_mint_associated
         {
@@ -329,7 +330,7 @@ pub fn support_mint_associated_is_initialized(
             break;
         }
     }
-    return Ok(mint_associated_is_initialized);
+    Ok(mint_associated_is_initialized)
 }
 
 pub fn is_supported_mint(

@@ -32,7 +32,12 @@ export async function createTokenMintAndAssociatedTokenAccount(
   mintAuthority: Signer,
   transferFeeConfig: { transferFeeBasisPoints: number; MaxFee: number },
   allToken2022?: boolean
-) {
+): Promise<
+  [
+    { token0: PublicKey; token0Program: PublicKey },
+    { token1: PublicKey; token1Program: PublicKey }
+  ]
+> {
   let ixs: TransactionInstruction[] = [];
   ixs.push(
     web3.SystemProgram.transfer({

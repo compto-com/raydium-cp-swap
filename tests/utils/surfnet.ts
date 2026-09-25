@@ -37,6 +37,9 @@ export async function ensureMainnetTokenProgram(
     }
 
     const local = await connection.getAccountInfo(TOKEN_PROGRAM_ID);
+    if (local === null) {
+      throw new Error("local token program account does not exist");
+    }
     if (local.owner.equals(UPGRADEABLE_LOADER)) {
       // mainnet deployment already installed
       return true;
@@ -52,6 +55,10 @@ export async function ensureMainnetTokenProgram(
         TOKEN_PROGRAM_ID,
         programdataAddress,
       ]);
+
+    if (programAccount === null || programdataAccount === null) {
+      throw new Error("failed to fetch mainnet token program accounts");
+    }
 
     // install programdata first so the program account never points at nothing
     for (const [address, account] of [

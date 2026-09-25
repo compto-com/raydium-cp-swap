@@ -110,6 +110,9 @@ describe("collect excess lamports test", () => {
 
   async function getRentMinimumBalance(address: PublicKey) {
     const info = await anchor.getProvider().connection.getAccountInfo(address);
+    if (info === null) {
+      throw new Error(`account ${address.toBase58()} does not exist`);
+    }
     return await anchor
       .getProvider()
       .connection.getMinimumBalanceForRentExemption(info.data.length);
@@ -185,6 +188,7 @@ describe("collect excess lamports test", () => {
       await collectExcessLamports(program, invalidOwner, [poolAddress]);
       assert.fail("expected InvalidOwner");
     } catch (err) {
+      assert(err instanceof anchor.AnchorError);
       assert.include(err.toString(), "InvalidOwner");
     }
   });
@@ -250,7 +254,7 @@ describe("collect excess lamports test", () => {
       TOKEN_PROGRAM_ID
     );
     const [authority] = await getAuthAddress(program.programId);
-    assert.equal(lpMintAfter.mintAuthority.toBase58(), authority.toBase58());
+    assert.equal(lpMintAfter.mintAuthority!.toBase58(), authority.toBase58());
     assert.equal(lpMintAfter.supply.toString(), lpMintBefore.supply.toString());
   });
 

@@ -9,7 +9,7 @@ fn ceil_div(token_amount: u128, fee_numerator: u128, fee_denominator: u128) -> O
         return None;
     }
     token_amount
-        .checked_mul(u128::from(fee_numerator))?
+        .checked_mul(fee_numerator)?
         .checked_add(fee_denominator)?
         .checked_sub(1)?
         .checked_div(fee_denominator)

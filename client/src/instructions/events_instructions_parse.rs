@@ -24,12 +24,11 @@ pub fn parse_program_event(
     meta: Option<UiTransactionStatusMeta>,
 ) -> Result<(), ClientError> {
     let logs: Vec<String> = if let Some(meta_data) = meta {
-        let log_messages = if let OptionSerializer::Some(log_messages) = meta_data.log_messages {
+        if let OptionSerializer::Some(log_messages) = meta_data.log_messages {
             log_messages
         } else {
             Vec::new()
-        };
-        log_messages
+        }
     } else {
         Vec::new()
     };
@@ -39,7 +38,7 @@ pub fn parse_program_event(
             for l in logs {
                 let (new_program, did_pop) =
                     if !execution.is_empty() && self_program_str == execution.program() {
-                        handle_program_log(self_program_str, &l, true).unwrap_or_else(|e| {
+                        handle_program_log(self_program_str, l, true).unwrap_or_else(|e| {
                             println!("Unable to parse log: {e}");
                             std::process::exit(1);
                         })
@@ -117,7 +116,7 @@ pub fn handle_program_log(
     } else {
         Some(l)
     } {
-        if l.starts_with(&format!("Program log:")) {
+        if l.starts_with("Program log:") {
             // not log event
             return Ok((None, false));
         }
@@ -149,10 +148,10 @@ pub fn handle_program_log(
                 println!("unknow event: {}", l);
             }
         }
-        return Ok((None, false));
+        Ok((None, false))
     } else {
         let (program, did_pop) = handle_system_log(self_program_str, l);
-        return Ok((program, did_pop));
+        Ok((program, did_pop))
     }
 }
 
@@ -211,14 +210,11 @@ pub fn parse_program_instruction(
     if meta.is_some() {
         let mut account_keys = ui_raw_msg.account_keys;
         let meta = meta.clone().unwrap();
-        match meta.loaded_addresses {
-            OptionSerializer::Some(addresses) => {
-                let mut writeable_address = addresses.writable;
-                let mut readonly_address = addresses.readonly;
-                account_keys.append(&mut writeable_address);
-                account_keys.append(&mut readonly_address);
-            }
-            _ => {}
+        if let OptionSerializer::Some(addresses) = meta.loaded_addresses {
+            let mut writeable_address = addresses.writable;
+            let mut readonly_address = addresses.readonly;
+            account_keys.append(&mut writeable_address);
+            account_keys.append(&mut readonly_address);
         }
         let program_index = account_keys
             .iter()
@@ -237,32 +233,25 @@ pub fn parse_program_instruction(
             }
         }
 
-        match meta.inner_instructions {
-            OptionSerializer::Some(inner_instructions) => {
-                for inner in inner_instructions {
-                    for (i, instruction) in inner.instructions.iter().enumerate() {
-                        match instruction {
-                            solana_transaction_status::UiInstruction::Compiled(
-                                ui_compiled_instruction,
-                            ) => {
-                                if (ui_compiled_instruction.program_id_index as usize)
-                                    == program_index
-                                {
-                                    let out_put =
-                                        format!("inner_instruction #{}.{}", inner.index + 1, i + 1);
-                                    println!("{}", out_put.gradient(Color::Green));
-                                    handle_program_instruction(
-                                        &ui_compiled_instruction.data,
-                                        InstructionDecodeType::Base58,
-                                    )?;
-                                }
-                            }
-                            _ => {}
+        if let OptionSerializer::Some(inner_instructions) = meta.inner_instructions {
+            for inner in inner_instructions {
+                for (i, instruction) in inner.instructions.iter().enumerate() {
+                    if let solana_transaction_status::UiInstruction::Compiled(
+                        ui_compiled_instruction,
+                    ) = instruction
+                    {
+                        if (ui_compiled_instruction.program_id_index as usize) == program_index {
+                            let out_put =
+                                format!("inner_instruction #{}.{}", inner.index + 1, i + 1);
+                            println!("{}", out_put.gradient(Color::Green));
+                            handle_program_instruction(
+                                &ui_compiled_instruction.data,
+                                InstructionDecodeType::Base58,
+                            )?;
                         }
                     }
                 }
             }
-            _ => {}
         }
     }
     Ok(())
@@ -272,11 +261,8 @@ pub fn handle_program_instruction(
     instr_data: &str,
     decode_type: InstructionDecodeType,
 ) -> Result<(), ClientError> {
-    let data;
-    match decode_type {
-        InstructionDecodeType::BaseHex => {
-            data = hex::decode(instr_data).unwrap();
-        }
+    let data = match decode_type {
+        InstructionDecodeType::BaseHex => hex::decode(instr_data).unwrap(),
         InstructionDecodeType::Base64 => {
             let borsh_bytes = match base64::Engine::decode(
                 &base64::engine::general_purpose::STANDARD,
@@ -288,7 +274,7 @@ pub fn handle_program_instruction(
                     return Ok(());
                 }
             };
-            data = borsh_bytes;
+            borsh_bytes
         }
         InstructionDecodeType::Base58 => {
             let borsh_bytes = match bs58::decode(instr_data).into_vec() {
@@ -298,9 +284,9 @@ pub fn handle_program_instruction(
                     return Ok(());
                 }
             };
-            data = borsh_bytes;
+            borsh_bytes
         }
-    }
+    };
 
     if data.len() < DISCRIMINATOR_LEN {
         return Err(ClientError::LogParseError(

@@ -92,6 +92,7 @@ impl CurveCalculator {
 
     /// Subtract fees and calculate how much destination token will be provided
     /// given an amount of source token.
+    #[allow(clippy::too_many_arguments)]
     pub fn swap_base_input(
         input_amount: u128,
         input_vault_amount: u128,
@@ -142,6 +143,7 @@ impl CurveCalculator {
         })
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn swap_base_output(
         output_amount: u128,
         input_vault_amount: u128,
