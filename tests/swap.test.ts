@@ -1,7 +1,12 @@
 import * as anchor from "@anchor-lang/core";
 import { Program, BN } from "@anchor-lang/core";
 import { RaydiumCpSwap } from "../target/types/raydium_cp_swap";
-import { setupSwapTest, swap_base_input, swap_base_output } from "./utils";
+import {
+  setupSwapTest,
+  swap_base_input,
+  swap_base_output,
+  advancePastPoolOpenTime,
+} from "./utils";
 import { assert } from "chai";
 import { getAccount, getAssociatedTokenAddressSync } from "@solana/spl-token";
 
@@ -43,7 +48,7 @@ describe("swap test", () => {
       "processed",
       inputTokenProgram
     );
-    await sleep(1000);
+    await advancePastPoolOpenTime(anchor.getProvider().connection);
     let amount_in = new BN(100000000);
     await swap_base_input(
       program,
@@ -104,7 +109,7 @@ describe("swap test", () => {
       "processed",
       outputTokenProgram
     );
-    await sleep(1000);
+    await advancePastPoolOpenTime(anchor.getProvider().connection);
     let amount_out = new BN(100000000);
     await swap_base_output(
       program,
@@ -168,7 +173,7 @@ describe("swap test", () => {
       "processed",
       outputTokenProgram
     );
-    await sleep(1000);
+    await advancePastPoolOpenTime(anchor.getProvider().connection);
     let amount_out = new BN(100000000);
     await swap_base_output(
       program,
@@ -195,6 +200,3 @@ describe("swap test", () => {
   });
 });
 
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}

@@ -261,7 +261,6 @@ export async function createAmmConfig(
     .instruction();
 
   const tx = await sendTransaction(connection, [ix], [owner], confirmOptions);
-  console.log("init amm config tx: ", tx);
   return address;
 }
 
