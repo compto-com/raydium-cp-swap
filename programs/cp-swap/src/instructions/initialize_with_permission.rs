@@ -197,14 +197,10 @@ pub fn initialize_with_permission(
     open_time: u64,
     creator_fee_on: CreatorFeeOn,
 ) -> Result<()> {
-    let mint0_associated_is_initialized = support_mint_associated_is_initialized(
-        &ctx.remaining_accounts,
-        &ctx.accounts.token_0_mint,
-    )?;
-    let mint1_associated_is_initialized = support_mint_associated_is_initialized(
-        &ctx.remaining_accounts,
-        &ctx.accounts.token_1_mint,
-    )?;
+    let mint0_associated_is_initialized =
+        support_mint_associated_is_initialized(ctx.remaining_accounts, &ctx.accounts.token_0_mint)?;
+    let mint1_associated_is_initialized =
+        support_mint_associated_is_initialized(ctx.remaining_accounts, &ctx.accounts.token_1_mint)?;
     if !(is_supported_mint(&ctx.accounts.token_0_mint, mint0_associated_is_initialized).unwrap()
         && is_supported_mint(&ctx.accounts.token_1_mint, mint1_associated_is_initialized).unwrap())
     {
@@ -334,7 +330,7 @@ pub fn initialize_with_permission(
             &system_instruction::transfer(
                 ctx.accounts.payer.key,
                 &ctx.accounts.create_pool_fee.key(),
-                u64::from(ctx.accounts.amm_config.create_pool_fee),
+                ctx.accounts.amm_config.create_pool_fee,
             ),
             &[
                 ctx.accounts.payer.to_account_info(),

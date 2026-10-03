@@ -1,4 +1,4 @@
-import { Connection, PublicKey } from "@solana/web3.js";
+import { Connection, PublicKey, SYSVAR_CLOCK_PUBKEY } from "@solana/web3.js";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 
 const UPGRADEABLE_LOADER = new PublicKey(
@@ -37,6 +37,9 @@ export async function ensureMainnetTokenProgram(
     }
 
     const local = await connection.getAccountInfo(TOKEN_PROGRAM_ID);
+    if (local === null) {
+      throw new Error("local token program account does not exist");
+    }
     if (local.owner.equals(UPGRADEABLE_LOADER)) {
       // mainnet deployment already installed
       return true;
@@ -52,6 +55,10 @@ export async function ensureMainnetTokenProgram(
         TOKEN_PROGRAM_ID,
         programdataAddress,
       ]);
+
+    if (programAccount === null || programdataAccount === null) {
+      throw new Error("failed to fetch mainnet token program accounts");
+    }
 
     // install programdata first so the program account never points at nothing
     for (const [address, account] of [
@@ -78,4 +85,39 @@ export async function ensureMainnetTokenProgram(
     );
     return false;
   }
+}
+
+// Clock sysvar layout: slot(u64), epoch_start_timestamp(i64),
+// epoch(u64), leader_schedule_epoch(u64), unix_timestamp(i64).
+async function getOnChainUnixTimestamp(
+  connection: Connection
+): Promise<bigint> {
+  const info = await connection.getAccountInfo(SYSVAR_CLOCK_PUBKEY);
+  if (info === null) {
+    throw new Error("clock sysvar account does not exist");
+  }
+  return info.data.readBigInt64LE(8 + 8 + 8 + 8);
+}
+
+// Pool `open_time` is bumped to at least the on-chain clock's unix_timestamp
+// at pool-init time + 1 (see initialize.rs), and swaps are rejected with
+// NotApproved until the on-chain clock passes that value. `anchor test`
+// runs surfpool ("surfnet"), whose clock does not reliably advance with
+// real/wall-clock time the way solana-test-validator's does, so sleeping a
+// fixed duration and hoping the clock caught up is flaky. When running on
+// a surfnet, warp the clock forward directly via the surfnet_timeTravel
+// cheatcode; otherwise fall back to a short sleep for a real validator.
+export async function advancePastPoolOpenTime(
+  connection: Connection
+): Promise<void> {
+  const version = await rpcCall(connection.rpcEndpoint, "getVersion", []);
+  if (version["surfnet-version"] === undefined) {
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    return;
+  }
+
+  const currentUnixTimestamp = await getOnChainUnixTimestamp(connection);
+  await rpcCall(connection.rpcEndpoint, "surfnet_timeTravel", [
+    { absoluteTimestamp: Number(currentUnixTimestamp + 2n) * 1000 },
+  ]);
 }

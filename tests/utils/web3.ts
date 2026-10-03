@@ -61,5 +61,5 @@ export async function getBlockTimestamp(
   connection: Connection
 ): Promise<number> {
   let slot = await connection.getSlot();
-  return await connection.getBlockTime(slot);
+  return (await connection.getBlockTime(slot))!;
 }

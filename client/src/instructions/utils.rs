@@ -18,12 +18,12 @@ pub fn deserialize_anchor_account<T: AccountDeserialize>(account: &CliAccount) -
 }
 
 pub fn unpack_token(token_data: &[u8]) -> Result<PodStateWithExtensions<'_, PodAccount>> {
-    let token = PodStateWithExtensions::<PodAccount>::unpack(&token_data)?;
+    let token = PodStateWithExtensions::<PodAccount>::unpack(token_data)?;
     Ok(token)
 }
 
 pub fn unpack_mint(token_data: &[u8]) -> Result<PodStateWithExtensions<'_, PodMint>> {
-    let mint = PodStateWithExtensions::<PodMint>::unpack(&token_data)?;
+    let mint = PodStateWithExtensions::<PodMint>::unpack(token_data)?;
     Ok(mint)
 }
 

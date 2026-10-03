@@ -83,7 +83,7 @@ pub fn create_account_rent_exmpt_instr(
         .request()
         .instruction(system_instruction::create_account(
             &program.payer(),
-            &new_account_key,
+            new_account_key,
             program
                 .rpc()
                 .get_minimum_balance_for_rent_exemption(data_size)?,
@@ -127,7 +127,7 @@ pub fn create_and_init_auxiliary_token(
 ) -> Result<Vec<Instruction>> {
     let payer = read_keypair_file(&config.payer_path)?;
     let url = Cluster::Custom(config.http_url.clone(), config.ws_url.clone());
-    let mint_account = &mut RpcClient::new(config.http_url.to_string()).get_account(&mint)?;
+    let mint_account = &mut RpcClient::new(config.http_url.to_string()).get_account(mint)?;
     // Client.
     let client = Client::new(url, Rc::new(payer));
     let (program, space) = if mint_account.owner == spl_token::id() {
@@ -136,8 +136,7 @@ pub fn create_and_init_auxiliary_token(
             spl_token::state::Account::LEN,
         )
     } else {
-        let mut extensions = vec![];
-        extensions.push(ExtensionType::ImmutableOwner);
+        let extensions = vec![ExtensionType::ImmutableOwner];
         let mint_state = StateWithExtensionsMut::<Mint>::unpack(mint_account.data_as_mut_slice())?;
         let mint_extension_types = mint_state.get_extension_types()?;
         let mut required_extensions =
@@ -156,7 +155,7 @@ pub fn create_and_init_auxiliary_token(
         .request()
         .instruction(system_instruction::create_account(
             &program.payer(),
-            &mint,
+            mint,
             program
                 .rpc()
                 .get_minimum_balance_for_rent_exemption(space)?,

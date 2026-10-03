@@ -57,8 +57,9 @@ pub fn swap_base_output(
     )
     .ok_or(ErrorCode::ZeroTradingTokens)?;
 
-    let constant_after = u128::from(result.new_input_vault_amount)
-        .checked_mul(u128::from(result.new_output_vault_amount))
+    let constant_after = result
+        .new_input_vault_amount
+        .checked_mul(result.new_output_vault_amount)
         .unwrap();
 
     #[cfg(feature = "enable-log")]

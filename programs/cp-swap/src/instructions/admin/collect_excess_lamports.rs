@@ -34,7 +34,7 @@ pub struct CollectExcessLamports<'info> {
 pub fn collect_excess_lamports<'info>(
     ctx: Context<'info, CollectExcessLamports<'info>>,
 ) -> Result<()> {
-    for source_lamports_account in ctx.remaining_accounts.into_iter() {
+    for source_lamports_account in ctx.remaining_accounts.iter() {
         if *source_lamports_account.owner == Token::id() {
             withdraw_excess_lamports_from_token(
                 ctx.accounts.token_program.to_account_info(),
@@ -95,5 +95,5 @@ fn withdraw_excess_lamports_from_pda(
             .checked_add(excess_lamports)
             .ok_or(ProgramError::ArithmeticOverflow)?;
     }
-    return Ok(());
+    Ok(())
 }

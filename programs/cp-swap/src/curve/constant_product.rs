@@ -25,8 +25,7 @@ impl ConstantProductCurve {
         // delta_y = (delta_x * y) / (x + delta_x)
         let numerator = input_amount.checked_mul(output_vault_amount).unwrap();
         let denominator = input_vault_amount.checked_add(input_amount).unwrap();
-        let output_amount = numerator.checked_div(denominator).unwrap();
-        output_amount
+        numerator.checked_div(denominator).unwrap()
     }
 
     pub fn swap_base_output_without_fees(
@@ -38,8 +37,7 @@ impl ConstantProductCurve {
         // delta_x = (x * delta_y) / (y - delta_y)
         let numerator = input_vault_amount.checked_mul(output_amount).unwrap();
         let denominator = output_vault_amount.checked_sub(output_amount).unwrap();
-        let input_amount = numerator.checked_ceil_div(denominator).unwrap();
-        input_amount
+        numerator.checked_ceil_div(denominator).unwrap()
     }
 
     /// Get the amount of trading tokens for the given amount of pool tokens,

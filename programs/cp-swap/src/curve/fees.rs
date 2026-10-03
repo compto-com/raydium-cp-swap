@@ -9,7 +9,7 @@ fn ceil_div(token_amount: u128, fee_numerator: u128, fee_denominator: u128) -> O
         return None;
     }
     token_amount
-        .checked_mul(u128::from(fee_numerator))?
+        .checked_mul(fee_numerator)?
         .checked_add(fee_denominator)?
         .checked_sub(1)?
         .checked_div(fee_denominator)
@@ -67,6 +67,9 @@ impl Fees {
         trade_fee_rate: u64,
         creator_fee_rate: u64,
     ) -> Option<u128> {
+        if trade_fee_rate == 0 && creator_fee_rate == 0 {
+            return Some(0);
+        }
         floor_div(
             total_fee,
             u128::from(creator_fee_rate),
@@ -87,5 +90,55 @@ impl Fees {
                 .checked_sub(1)?
                 .checked_div(denominator)
         }
+    }
+}
+
+#[cfg(test)]
+mod fees_test {
+    use super::*;
+
+    #[test]
+    fn zero_fee_rate_yields_zero_fees() {
+        assert_eq!(Fees::trading_fee(123_456, 0), Some(0));
+        assert_eq!(Fees::protocol_fee(123_456, 0), Some(0));
+        assert_eq!(Fees::fund_fee(123_456, 0), Some(0));
+        assert_eq!(Fees::creator_fee(123_456, 0), Some(0));
+    }
+
+    #[test]
+    fn zero_amount_yields_zero_fees_regardless_of_rate() {
+        assert_eq!(Fees::trading_fee(0, 2_500), Some(0));
+        assert_eq!(Fees::protocol_fee(0, 120_000), Some(0));
+        assert_eq!(Fees::fund_fee(0, 40_000), Some(0));
+        assert_eq!(Fees::creator_fee(0, 2_500), Some(0));
+    }
+
+    #[test]
+    fn split_creator_fee_with_zero_total_fee_is_zero() {
+        assert_eq!(Fees::split_creator_fee(0, 2_500, 2_500), Some(0));
+    }
+
+    #[test]
+    fn split_creator_fee_with_zero_rates_is_zero() {
+        // trade_fee_rate + creator_fee_rate == 0 would otherwise divide by zero;
+        // both rates being zero means there is no fee to split.
+        assert_eq!(Fees::split_creator_fee(100, 0, 0), Some(0));
+        assert_eq!(Fees::split_creator_fee(0, 0, 0), Some(0));
+    }
+
+    #[test]
+    fn calculate_pre_fee_amount_with_zero_rate_is_identity() {
+        assert_eq!(Fees::calculate_pre_fee_amount(1_000_000, 0), Some(1_000_000));
+        assert_eq!(Fees::calculate_pre_fee_amount(0, 0), Some(0));
+    }
+
+    #[test]
+    fn ceil_div_with_zero_denominator_is_none() {
+        assert_eq!(ceil_div(100, 10, 0), None);
+    }
+
+    #[test]
+    fn floor_div_with_zero_denominator_is_none() {
+        assert_eq!(floor_div(100, 10, 0), None);
     }
 }

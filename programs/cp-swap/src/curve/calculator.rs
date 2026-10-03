@@ -92,6 +92,7 @@ impl CurveCalculator {
 
     /// Subtract fees and calculate how much destination token will be provided
     /// given an amount of source token.
+    #[allow(clippy::too_many_arguments)]
     pub fn swap_base_input(
         input_amount: u128,
         input_vault_amount: u128,
@@ -142,6 +143,7 @@ impl CurveCalculator {
         })
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn swap_base_output(
         output_amount: u128,
         input_vault_amount: u128,
@@ -387,5 +389,112 @@ pub mod test {
                         -> (u64, u64) {
            (total, intermediate)
        }
+    }
+
+    #[test]
+    fn swap_base_input_with_zero_fees_matches_fee_free_curve() {
+        let input_amount = 10_000u128;
+        let input_vault_amount = 1_000_000u128;
+        let output_vault_amount = 2_000_000u128;
+
+        for is_creator_fee_on_input in [true, false] {
+            let result = CurveCalculator::swap_base_input(
+                input_amount,
+                input_vault_amount,
+                output_vault_amount,
+                0,
+                0,
+                0,
+                0,
+                is_creator_fee_on_input,
+            )
+            .unwrap();
+
+            let expected_output = ConstantProductCurve::swap_base_input_without_fees(
+                input_amount,
+                input_vault_amount,
+                output_vault_amount,
+            );
+
+            assert_eq!(result.trade_fee, 0);
+            assert_eq!(result.protocol_fee, 0);
+            assert_eq!(result.fund_fee, 0);
+            assert_eq!(result.creator_fee, 0);
+            assert_eq!(result.input_amount, input_amount);
+            assert_eq!(result.output_amount, expected_output);
+            assert_eq!(
+                result.new_input_vault_amount,
+                input_vault_amount + input_amount
+            );
+            assert_eq!(
+                result.new_output_vault_amount,
+                output_vault_amount - expected_output
+            );
+        }
+    }
+
+    #[test]
+    fn swap_base_output_with_zero_fees_matches_fee_free_curve() {
+        let output_amount = 10_000u128;
+        let input_vault_amount = 1_000_000u128;
+        let output_vault_amount = 2_000_000u128;
+
+        for is_creator_fee_on_input in [true, false] {
+            let result = CurveCalculator::swap_base_output(
+                output_amount,
+                input_vault_amount,
+                output_vault_amount,
+                0,
+                0,
+                0,
+                0,
+                is_creator_fee_on_input,
+            )
+            .unwrap();
+
+            let expected_input = ConstantProductCurve::swap_base_output_without_fees(
+                output_amount,
+                input_vault_amount,
+                output_vault_amount,
+            );
+
+            assert_eq!(result.trade_fee, 0);
+            assert_eq!(result.protocol_fee, 0);
+            assert_eq!(result.fund_fee, 0);
+            assert_eq!(result.creator_fee, 0);
+            assert_eq!(result.output_amount, output_amount);
+            assert_eq!(result.input_amount, expected_input);
+            assert_eq!(
+                result.new_input_vault_amount,
+                input_vault_amount + expected_input
+            );
+            assert_eq!(
+                result.new_output_vault_amount,
+                output_vault_amount - output_amount
+            );
+        }
+    }
+
+    #[test]
+    fn swap_base_input_zero_amount_with_zero_fees_is_noop() {
+        let input_vault_amount = 500_000u128;
+        let output_vault_amount = 750_000u128;
+
+        let result = CurveCalculator::swap_base_input(
+            0,
+            input_vault_amount,
+            output_vault_amount,
+            0,
+            0,
+            0,
+            0,
+            false,
+        )
+        .unwrap();
+
+        assert_eq!(result.input_amount, 0);
+        assert_eq!(result.output_amount, 0);
+        assert_eq!(result.new_input_vault_amount, input_vault_amount);
+        assert_eq!(result.new_output_vault_amount, output_vault_amount);
     }
 }
