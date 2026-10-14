@@ -2,8 +2,13 @@ import * as anchor from "@anchor-lang/core";
 import { Program, BN } from "@anchor-lang/core";
 import { RaydiumCpSwap } from "../target/types/raydium_cp_swap";
 
-import { getAccount, TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { PublicKey } from "@solana/web3.js";
+import {
+  getAccount,
+  getAssociatedTokenAddressSync,
+  getOrCreateAssociatedTokenAccount,
+  TOKEN_PROGRAM_ID,
+  NATIVE_MINT,
+} from "@solana/spl-token";
 import { setupInitializeTest, initialize, calculateFee } from "./utils";
 import { assert } from "chai";
 
@@ -18,10 +23,12 @@ describe("initialize test", () => {
     skipPreflight: true,
   };
 
-  // the create-pool fee is transferred to this fixed wsol account
-  // (crate::create_pool_fee_reveiver::ID) and synced into its wrapped amount
-  const createPoolFeeReceiver = new PublicKey(
-    "DNXgeM9EiiaAbaWvwjHj9fQQLAX5ZsfHyvmYUNRAdNC8"
+  // the create-pool fee is transferred to the local wallet's wsol ATA
+  // (crate::create_pool_fee_reveiver::ID, injected at build time via
+  // CPSWAP_LOCALNET_CREATE_POOL_FEE_RECEIVER) and synced into its wrapped amount
+  const createPoolFeeReceiver = getAssociatedTokenAddressSync(
+    NATIVE_MINT,
+    owner.publicKey
   );
 
   // creating an amm config is admin-gated, `yarn test:local-admin` compiles the
@@ -29,6 +36,15 @@ describe("initialize test", () => {
   // differs from the mainnet ones cloned into the validator
   const adminIsLocalWallet =
     process.env.CPSWAP_LOCALNET_ADMIN === owner.publicKey.toBase58();
+
+  before(async () => {
+    await getOrCreateAssociatedTokenAccount(
+      anchor.getProvider().connection,
+      owner,
+      NATIVE_MINT,
+      owner.publicKey
+    );
+  });
 
   async function getCollectedCreatePoolFee() {
     const account = await getAccount(
@@ -105,12 +121,10 @@ describe("initialize test", () => {
         anchor.getProvider().connection,
         owner,
         {
-          config_index: 0,
+          config_index: 1001,
           tradeFeeRate: new BN(10),
           protocolFeeRate: new BN(1000),
           fundFeeRate: new BN(25000),
-          // only used if config 0 has to be created, the cloned mainnet config
-          // already carries its own create_pool_fee
           create_fee: new BN(100000000),
         },
         { transferFeeBasisPoints: 0, MaxFee: 0 },
@@ -119,7 +133,7 @@ describe("initialize test", () => {
     const ammConfig = await program.account.ammConfig.fetch(configAddress);
     assert(
       ammConfig.createPoolFee.gtn(0),
-      "amm config 0 must carry a create fee for this case to mean anything"
+      "amm config 1001 must carry a create fee for this case to mean anything"
     );
     const collectedFeeBefore = await getCollectedCreatePoolFee();
 
@@ -166,7 +180,7 @@ describe("initialize test", () => {
         anchor.getProvider().connection,
         owner,
         {
-          config_index: 0,
+          config_index: 1001,
           tradeFeeRate: new BN(10),
           protocolFeeRate: new BN(1000),
           fundFeeRate: new BN(25000),

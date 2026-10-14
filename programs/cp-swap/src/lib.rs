@@ -8,21 +8,10 @@ use anchor_lang::prelude::*;
 use instructions::*;
 pub use states::CreatorFeeOn;
 
-#[cfg(not(feature = "no-entrypoint"))]
-solana_security_txt::security_txt! {
-    name: "raydium-cp-swap",
-    project_url: "https://raydium.io",
-    contacts: "link:https://immunefi.com/bounty/raydium",
-    policy: "https://immunefi.com/bounty/raydium",
-    source_code: "https://github.com/raydium-io/raydium-cp-swap",
-    preferred_languages: "en",
-    auditors: "https://github.com/raydium-io/raydium-docs/blob/master/audit/MadShield%20Q1%202024/raydium-cp-swap-v-1.0.0.pdf"
-}
-
 #[cfg(feature = "devnet")]
-declare_id!("DRaycpLY18LhpbydsBWbVJtxpNv9oXPgjRSfpF2bWpYb");
+declare_id!("GVSzpfu4CzCxgU7wNeNy4eCeDX6R7ecY3vKSRLuDJfu1");
 #[cfg(not(feature = "devnet"))]
-declare_id!("CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C");
+declare_id!("GVSzpfu4CzCxgU7wNeNy4eCeDX6R7ecY3vKSRLuDJfu1");
 
 pub mod admin {
     #[cfg(not(feature = "localnet"))]
@@ -40,10 +29,18 @@ pub mod admin {
 }
 
 pub mod create_pool_fee_reveiver {
-    use super::{pubkey, Pubkey};
-    #[cfg(feature = "devnet")]
+    use super::Pubkey;
+
+    #[cfg(not(feature = "localnet"))]
+    use super::pubkey;
+    #[cfg(feature = "localnet")]
+    pub const ID: Pubkey = Pubkey::from_str_const(env!(
+        "CPSWAP_LOCALNET_CREATE_POOL_FEE_RECEIVER",
+        "the `localnet` feature needs CPSWAP_LOCALNET_CREATE_POOL_FEE_RECEIVER=<wsol token account pubkey> at build time (run `yarn test:local-admin`)"
+    ));
+    #[cfg(all(feature = "devnet", not(feature = "localnet")))]
     pub const ID: Pubkey = pubkey!("3oE58BKVt8KuYkGxx8zBojugnymWmBiyafWgMrnb6eYy");
-    #[cfg(not(feature = "devnet"))]
+    #[cfg(all(not(feature = "devnet"), not(feature = "localnet")))]
     pub const ID: Pubkey = pubkey!("DNXgeM9EiiaAbaWvwjHj9fQQLAX5ZsfHyvmYUNRAdNC8");
 }
 
