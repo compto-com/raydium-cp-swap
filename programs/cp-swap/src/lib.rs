@@ -8,64 +8,51 @@ use anchor_lang::prelude::*;
 use instructions::*;
 pub use states::CreatorFeeOn;
 
-#[cfg(feature = "devnet")]
-declare_id!("GVSzpfu4CzCxgU7wNeNy4eCeDX6R7ecY3vKSRLuDJfu1");
-#[cfg(not(feature = "devnet"))]
 declare_id!("GVSzpfu4CzCxgU7wNeNy4eCeDX6R7ecY3vKSRLuDJfu1");
 
 pub mod admin {
+    use super::Pubkey;
+
     #[cfg(not(feature = "localnet"))]
     use super::pubkey;
-    use super::Pubkey;
+
     #[cfg(feature = "localnet")]
     pub const ID: Pubkey = Pubkey::from_str_const(env!(
         "CPSWAP_LOCALNET_ADMIN",
         "the `localnet` feature needs CPSWAP_LOCALNET_ADMIN=<admin pubkey> at build time (run `yarn test:local-admin`)"
     ));
-    #[cfg(feature = "devnet")]
-    pub const ID: Pubkey = pubkey!("DRayqG9RXYi8WHgWEmRQGrUWRWbhjYWYkCRJDd6JBBak");
-    #[cfg(all(not(feature = "devnet"), not(feature = "localnet")))]
-    pub const ID: Pubkey = pubkey!("GThUX1Atko4tqhN2NaiTazWSeFWMuiUvfFnyJyUghFMJ");
+    #[cfg(not(feature = "localnet"))]
+    pub const ID: Pubkey = pubkey!("AvLfQNWrZGKtNtTts54vu7Bh7ib6Kg2boTSszviofZit");
 }
 
-pub mod create_pool_fee_reveiver {
+pub mod create_pool_fee_receiver {
     use super::Pubkey;
 
     #[cfg(not(feature = "localnet"))]
     use super::pubkey;
+
     #[cfg(feature = "localnet")]
     pub const ID: Pubkey = Pubkey::from_str_const(env!(
         "CPSWAP_LOCALNET_CREATE_POOL_FEE_RECEIVER",
         "the `localnet` feature needs CPSWAP_LOCALNET_CREATE_POOL_FEE_RECEIVER=<wsol token account pubkey> at build time (run `yarn test:local-admin`)"
     ));
-    #[cfg(all(feature = "devnet", not(feature = "localnet")))]
-    pub const ID: Pubkey = pubkey!("3oE58BKVt8KuYkGxx8zBojugnymWmBiyafWgMrnb6eYy");
-    #[cfg(all(not(feature = "devnet"), not(feature = "localnet")))]
-    pub const ID: Pubkey = pubkey!("DNXgeM9EiiaAbaWvwjHj9fQQLAX5ZsfHyvmYUNRAdNC8");
+    #[cfg(not(feature = "localnet"))]
+    pub const ID: Pubkey = pubkey!("CDsQikWYLCS5gwHcuKeMR87YZXcxs7JAhPGNCMzkzx1j");
 }
 
 pub mod collect_lamports {
     use super::{pubkey, Pubkey};
-    #[cfg(feature = "devnet")]
-    pub const ID: Pubkey = pubkey!("DRaydJNq54dSDHUqYCE3G8YySgaXfZucbh7dTXw9fBMs");
-    #[cfg(not(feature = "devnet"))]
-    pub const ID: Pubkey = pubkey!("RayGkhY93thaTgCv98sx1pNLgBHhJDxWUeZXp4bjmnp");
+    pub const ID: Pubkey = pubkey!("7nAGdBN2KCP4g81XSqsxkoEo6auy33ygf4NsxY5w9jdN");
 }
 
 pub mod fund_fee_owner {
     use super::{pubkey, Pubkey};
-    #[cfg(feature = "devnet")]
-    pub const ID: Pubkey = pubkey!("DRay33UmULQCeawH3dVpJfN3uqLj6Qtq4ymSRx2pAgGK");
-    #[cfg(not(feature = "devnet"))]
-    pub const ID: Pubkey = pubkey!("FUNDduJTA7XcckKHKfAoEnnhuSud2JUCUZv6opWEjrBU");
+    pub const ID: Pubkey = pubkey!("6Pe5RkDCSBKTRTExBAaAdWe46WQk2E7U9n3w2q7j44Jr");
 }
 
 pub mod protocol_fee_owner {
     use super::{pubkey, Pubkey};
-    #[cfg(feature = "devnet")]
-    pub const ID: Pubkey = pubkey!("DRay33UmULQCeawH3dVpJfN3uqLj6Qtq4ymSRx2pAgGK");
-    #[cfg(not(feature = "devnet"))]
-    pub const ID: Pubkey = pubkey!("ProCXqRcXJjoUd1RNoo28bSizAA6EEqt9wURZYPDc5u");
+    pub const ID: Pubkey = pubkey!("7AecDu3RmpeNuu8oyVgcrL6mhzBBNKpXnoicUqFDG6Yr");
 }
 
 pub const AUTH_SEED: &str = "vault_and_lp_mint_auth_seed";

@@ -194,7 +194,7 @@ fn main() -> Result<()> {
                     &mint1,
                     &token_1_program,
                 ),
-                raydium_cp_swap::create_pool_fee_reveiver::ID,
+                raydium_cp_swap::create_pool_fee_receiver::ID,
                 random_pool_id,
                 init_amount_0,
                 init_amount_1,
