@@ -33,7 +33,7 @@ pub struct InitializeWithPermission<'info> {
     /// pool vault and lp mint authority
     #[account(
         seeds = [
-            crate::AUTH_SEED.as_bytes(),
+            crate::AUTH_SEED,
         ],
         bump,
     )]
@@ -42,7 +42,7 @@ pub struct InitializeWithPermission<'info> {
     /// CHECK: Initialize an account to store the pool state
     /// PDA account:
     /// seeds = [
-    ///     POOL_SEED.as_bytes(),
+    ///     POOL_SEED,
     ///     amm_config.key().as_ref(),
     ///     token_0_mint.key().as_ref(),
     ///     token_1_mint.key().as_ref(),
@@ -69,7 +69,7 @@ pub struct InitializeWithPermission<'info> {
     #[account(
         init,
         seeds = [
-            POOL_LP_MINT_SEED.as_bytes(),
+            POOL_LP_MINT_SEED,
             pool_state.key().as_ref(),
         ],
         bump,
@@ -110,7 +110,7 @@ pub struct InitializeWithPermission<'info> {
     #[account(
         mut,
         seeds = [
-            POOL_VAULT_SEED.as_bytes(),
+            POOL_VAULT_SEED,
             pool_state.key().as_ref(),
             token_0_mint.key().as_ref()
         ],
@@ -122,7 +122,7 @@ pub struct InitializeWithPermission<'info> {
     #[account(
         mut,
         seeds = [
-            POOL_VAULT_SEED.as_bytes(),
+            POOL_VAULT_SEED,
             pool_state.key().as_ref(),
             token_1_mint.key().as_ref()
         ],
@@ -141,7 +141,7 @@ pub struct InitializeWithPermission<'info> {
     #[account(
         init,
         seeds = [
-            OBSERVATION_SEED.as_bytes(),
+            OBSERVATION_SEED,
             pool_state.key().as_ref(),
         ],
         bump,
@@ -153,7 +153,7 @@ pub struct InitializeWithPermission<'info> {
     /// CHECK: PDA account used for permission verification.
     #[account(
         seeds = [
-            PERMISSION_SEED.as_bytes(),
+            PERMISSION_SEED,
             payer.key().as_ref(),
         ],
         bump,
@@ -173,7 +173,7 @@ pub struct InitializeWithPermission<'info> {
     // remaining account
     // #[account(
     //     seeds = [
-    //     SUPPORT_MINT_SEED.as_bytes(),
+    //     SUPPORT_MINT_SEED,
     //     token_0_mint.key().as_ref(),
     // ],
     //     bump
@@ -182,7 +182,7 @@ pub struct InitializeWithPermission<'info> {
 
     // #[account(
     //     seeds = [
-    //     SUPPORT_MINT_SEED.as_bytes(),
+    //     SUPPORT_MINT_SEED,
     //     token_1_mint.key().as_ref(),
     // ],
     //     bump
@@ -224,7 +224,7 @@ pub fn initialize_with_permission(
         &ctx.accounts.system_program.to_account_info(),
         &ctx.accounts.token_0_program.to_account_info(),
         &[
-            POOL_VAULT_SEED.as_bytes(),
+            POOL_VAULT_SEED,
             ctx.accounts.pool_state.key().as_ref(),
             ctx.accounts.token_0_mint.key().as_ref(),
             &[ctx.bumps.token_0_vault][..],
@@ -239,7 +239,7 @@ pub fn initialize_with_permission(
         &ctx.accounts.system_program.to_account_info(),
         &ctx.accounts.token_1_program.to_account_info(),
         &[
-            POOL_VAULT_SEED.as_bytes(),
+            POOL_VAULT_SEED,
             ctx.accounts.pool_state.key().as_ref(),
             ctx.accounts.token_1_mint.key().as_ref(),
             &[ctx.bumps.token_1_vault][..],
@@ -321,7 +321,7 @@ pub fn initialize_with_permission(
         liquidity
             .checked_sub(lock_lp_amount)
             .ok_or(ErrorCode::InitLpAmountTooLess)?,
-        &[&[crate::AUTH_SEED.as_bytes(), &[ctx.bumps.authority]]],
+        &[&[crate::AUTH_SEED, &[ctx.bumps.authority]]],
     )?;
 
     // Charge the fee to create a pool

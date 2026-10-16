@@ -26,7 +26,7 @@ pub struct CreatePermissionPda<'info> {
     #[account(
         init,
         seeds = [
-            PERMISSION_SEED.as_bytes(),
+            PERMISSION_SEED,
             permission_authority.key().as_ref()
         ],
         bump,

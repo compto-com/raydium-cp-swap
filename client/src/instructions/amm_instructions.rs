@@ -40,7 +40,7 @@ pub fn initialize_pool_instr(
 
     let amm_config_index = 0u16;
     let (amm_config_key, __bump) = Pubkey::find_program_address(
-        &[AMM_CONFIG_SEED.as_bytes(), &amm_config_index.to_be_bytes()],
+        &[AMM_CONFIG_SEED, &amm_config_index.to_be_bytes()],
         &program.id(),
     );
 
@@ -49,7 +49,7 @@ pub fn initialize_pool_instr(
     } else {
         Pubkey::find_program_address(
             &[
-                POOL_SEED.as_bytes(),
+                POOL_SEED,
                 amm_config_key.to_bytes().as_ref(),
                 token_0_mint.to_bytes().as_ref(),
                 token_1_mint.to_bytes().as_ref(),
@@ -59,10 +59,10 @@ pub fn initialize_pool_instr(
         .0
     };
 
-    let (authority, __bump) = Pubkey::find_program_address(&[AUTH_SEED.as_bytes()], &program.id());
+    let (authority, __bump) = Pubkey::find_program_address(&[AUTH_SEED], &program.id());
     let (token_0_vault, __bump) = Pubkey::find_program_address(
         &[
-            POOL_VAULT_SEED.as_bytes(),
+            POOL_VAULT_SEED,
             pool_account_key.to_bytes().as_ref(),
             token_0_mint.to_bytes().as_ref(),
         ],
@@ -70,24 +70,18 @@ pub fn initialize_pool_instr(
     );
     let (token_1_vault, __bump) = Pubkey::find_program_address(
         &[
-            POOL_VAULT_SEED.as_bytes(),
+            POOL_VAULT_SEED,
             pool_account_key.to_bytes().as_ref(),
             token_1_mint.to_bytes().as_ref(),
         ],
         &program.id(),
     );
     let (lp_mint_key, __bump) = Pubkey::find_program_address(
-        &[
-            POOL_LP_MINT_SEED.as_bytes(),
-            pool_account_key.to_bytes().as_ref(),
-        ],
+        &[POOL_LP_MINT_SEED, pool_account_key.to_bytes().as_ref()],
         &program.id(),
     );
     let (observation_key, __bump) = Pubkey::find_program_address(
-        &[
-            OBSERVATION_SEED.as_bytes(),
-            pool_account_key.to_bytes().as_ref(),
-        ],
+        &[OBSERVATION_SEED, pool_account_key.to_bytes().as_ref()],
         &program.id(),
     );
 
@@ -158,7 +152,7 @@ pub fn deposit_instr(
     let client = Client::new(url, Rc::new(payer));
     let program = client.program(config.raydium_cp_program)?;
 
-    let (authority, __bump) = Pubkey::find_program_address(&[AUTH_SEED.as_bytes()], &program.id());
+    let (authority, __bump) = Pubkey::find_program_address(&[AUTH_SEED], &program.id());
 
     let instructions = program
         .request()
@@ -208,7 +202,7 @@ pub fn withdraw_instr(
     let client = Client::new(url, Rc::new(payer));
     let program = client.program(config.raydium_cp_program)?;
 
-    let (authority, __bump) = Pubkey::find_program_address(&[AUTH_SEED.as_bytes()], &program.id());
+    let (authority, __bump) = Pubkey::find_program_address(&[AUTH_SEED], &program.id());
 
     let instructions = program
         .request()
@@ -260,7 +254,7 @@ pub fn swap_base_input_instr(
     let client = Client::new(url, Rc::new(payer));
     let program = client.program(config.raydium_cp_program)?;
 
-    let (authority, __bump) = Pubkey::find_program_address(&[AUTH_SEED.as_bytes()], &program.id());
+    let (authority, __bump) = Pubkey::find_program_address(&[AUTH_SEED], &program.id());
 
     let instructions = program
         .request()
@@ -310,7 +304,7 @@ pub fn swap_base_output_instr(
     let client = Client::new(url, Rc::new(payer));
     let program = client.program(config.raydium_cp_program)?;
 
-    let (authority, __bump) = Pubkey::find_program_address(&[AUTH_SEED.as_bytes()], &program.id());
+    let (authority, __bump) = Pubkey::find_program_address(&[AUTH_SEED], &program.id());
 
     let instructions = program
         .request()

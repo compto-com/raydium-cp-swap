@@ -17,7 +17,7 @@ pub struct CreateAmmConfig<'info> {
     #[account(
         init,
         seeds = [
-            AMM_CONFIG_SEED.as_bytes(),
+            AMM_CONFIG_SEED,
             &index.to_be_bytes()
         ],
         bump,

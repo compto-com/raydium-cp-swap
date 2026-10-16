@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
 
-pub const AMM_CONFIG_SEED: &str = "amm_config";
+#[constant]
+pub const AMM_CONFIG_SEED: &[u8] = b"amm_config";
 
 /// Holds the current owner of the factory
 #[account]

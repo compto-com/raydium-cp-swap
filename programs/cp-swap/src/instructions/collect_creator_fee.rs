@@ -15,7 +15,7 @@ pub struct CollectCreatorFee<'info> {
     /// CHECK: pool vault and lp mint authority
     #[account(
         seeds = [
-            crate::AUTH_SEED.as_bytes(),
+            crate::AUTH_SEED,
         ],
         bump,
     )]
@@ -93,7 +93,7 @@ pub fn collect_creator_fee(ctx: Context<CollectCreatorFee>) -> Result<()> {
         return err!(ErrorCode::NoFeeCollect);
     }
 
-    let signer_seeds: &[&[u8]] = &[crate::AUTH_SEED.as_bytes(), &[ctx.bumps.authority]];
+    let signer_seeds: &[&[u8]] = &[crate::AUTH_SEED, &[ctx.bumps.authority]];
 
     transfer_from_pool_vault_to_user(
         ctx.accounts.authority.to_account_info(),

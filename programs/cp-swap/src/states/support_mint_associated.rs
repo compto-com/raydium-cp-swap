@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
 
-pub const SUPPORT_MINT_SEED: &str = "support_mint";
+#[constant]
+pub const SUPPORT_MINT_SEED: &[u8] = b"support_mint";
 
 /// Holds the current owner of the factory
 #[account]

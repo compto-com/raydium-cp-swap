@@ -11,7 +11,7 @@ pub use states::CreatorFeeOn;
 declare_id!("GVSzpfu4CzCxgU7wNeNy4eCeDX6R7ecY3vKSRLuDJfu1");
 
 pub mod admin {
-    use super::Pubkey;
+    use super::{constant, Pubkey};
 
     #[cfg(not(feature = "localnet"))]
     use super::pubkey;
@@ -23,10 +23,13 @@ pub mod admin {
     ));
     #[cfg(not(feature = "localnet"))]
     pub const ID: Pubkey = pubkey!("AvLfQNWrZGKtNtTts54vu7Bh7ib6Kg2boTSszviofZit");
+
+    #[constant]
+    pub const ADMIN: Pubkey = ID;
 }
 
 pub mod create_pool_fee_receiver {
-    use super::Pubkey;
+    use super::{constant, Pubkey};
 
     #[cfg(not(feature = "localnet"))]
     use super::pubkey;
@@ -38,24 +41,40 @@ pub mod create_pool_fee_receiver {
     ));
     #[cfg(not(feature = "localnet"))]
     pub const ID: Pubkey = pubkey!("CDsQikWYLCS5gwHcuKeMR87YZXcxs7JAhPGNCMzkzx1j");
+
+    #[constant]
+    pub const CREATE_POOL_FEE_RECEIVER: Pubkey = ID;
 }
 
 pub mod collect_lamports {
-    use super::{pubkey, Pubkey};
+    use super::{constant, pubkey, Pubkey};
+
     pub const ID: Pubkey = pubkey!("7nAGdBN2KCP4g81XSqsxkoEo6auy33ygf4NsxY5w9jdN");
+
+    #[constant]
+    pub const COLLECT_LAMPORTS: Pubkey = ID;
 }
 
 pub mod fund_fee_owner {
-    use super::{pubkey, Pubkey};
+    use super::{constant, pubkey, Pubkey};
+
     pub const ID: Pubkey = pubkey!("6Pe5RkDCSBKTRTExBAaAdWe46WQk2E7U9n3w2q7j44Jr");
+
+    #[constant]
+    pub const FUND_FEE_OWNER: Pubkey = ID;
 }
 
 pub mod protocol_fee_owner {
-    use super::{pubkey, Pubkey};
+    use super::{constant, pubkey, Pubkey};
+
     pub const ID: Pubkey = pubkey!("7AecDu3RmpeNuu8oyVgcrL6mhzBBNKpXnoicUqFDG6Yr");
+
+    #[constant]
+    pub const PROTOCOL_FEE_OWNER: Pubkey = ID;
 }
 
-pub const AUTH_SEED: &str = "vault_and_lp_mint_auth_seed";
+#[constant]
+pub const AUTH_SEED: &[u8] = b"vault_and_lp_mint_auth_seed";
 
 #[program]
 pub mod raydium_cp_swap {

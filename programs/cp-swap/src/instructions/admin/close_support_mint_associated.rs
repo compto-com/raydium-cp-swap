@@ -20,7 +20,7 @@ pub struct CloseSupportMintAssociated<'info> {
     #[account(
         mut,
         seeds = [
-            SUPPORT_MINT_SEED.as_bytes(),
+            SUPPORT_MINT_SEED,
             token_mint.key().as_ref(),
         ],
         bump,
