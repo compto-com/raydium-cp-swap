@@ -30,7 +30,7 @@ pub struct Initialize<'info> {
     /// pool vault and lp mint authority
     #[account(
         seeds = [
-            crate::AUTH_SEED.as_bytes(),
+            crate::AUTH_SEED,
         ],
         bump,
     )]
@@ -39,7 +39,7 @@ pub struct Initialize<'info> {
     /// CHECK: Initialize an account to store the pool state
     /// PDA account:
     /// seeds = [
-    ///     POOL_SEED.as_bytes(),
+    ///     POOL_SEED,
     ///     amm_config.key().as_ref(),
     ///     token_0_mint.key().as_ref(),
     ///     token_1_mint.key().as_ref(),
@@ -66,7 +66,7 @@ pub struct Initialize<'info> {
     #[account(
         init,
         seeds = [
-            POOL_LP_MINT_SEED.as_bytes(),
+            POOL_LP_MINT_SEED,
             pool_state.key().as_ref(),
         ],
         bump,
@@ -107,7 +107,7 @@ pub struct Initialize<'info> {
     #[account(
         mut,
         seeds = [
-            POOL_VAULT_SEED.as_bytes(),
+            POOL_VAULT_SEED,
             pool_state.key().as_ref(),
             token_0_mint.key().as_ref()
         ],
@@ -119,7 +119,7 @@ pub struct Initialize<'info> {
     #[account(
         mut,
         seeds = [
-            POOL_VAULT_SEED.as_bytes(),
+            POOL_VAULT_SEED,
             pool_state.key().as_ref(),
             token_1_mint.key().as_ref()
         ],
@@ -130,7 +130,7 @@ pub struct Initialize<'info> {
     /// create pool fee account
     #[account(
         mut,
-        address= crate::create_pool_fee_reveiver::ID,
+        address= crate::create_pool_fee_receiver::ID,
     )]
     pub create_pool_fee: Box<InterfaceAccount<'info, TokenAccount>>,
 
@@ -138,7 +138,7 @@ pub struct Initialize<'info> {
     #[account(
         init,
         seeds = [
-            OBSERVATION_SEED.as_bytes(),
+            OBSERVATION_SEED,
             pool_state.key().as_ref(),
         ],
         bump,
@@ -162,7 +162,7 @@ pub struct Initialize<'info> {
     // remaining account
     // #[account(
     //     seeds = [
-    //     SUPPORT_MINT_SEED.as_bytes(),
+    //     SUPPORT_MINT_SEED,
     //     token_0_mint.key().as_ref(),
     // ],
     //     bump
@@ -171,7 +171,7 @@ pub struct Initialize<'info> {
 
     // #[account(
     //     seeds = [
-    //     SUPPORT_MINT_SEED.as_bytes(),
+    //     SUPPORT_MINT_SEED,
     //     token_1_mint.key().as_ref(),
     // ],
     //     bump
@@ -211,7 +211,7 @@ pub fn initialize(
         &ctx.accounts.system_program.to_account_info(),
         &ctx.accounts.token_0_program.to_account_info(),
         &[
-            POOL_VAULT_SEED.as_bytes(),
+            POOL_VAULT_SEED,
             ctx.accounts.pool_state.key().as_ref(),
             ctx.accounts.token_0_mint.key().as_ref(),
             &[ctx.bumps.token_0_vault][..],
@@ -226,7 +226,7 @@ pub fn initialize(
         &ctx.accounts.system_program.to_account_info(),
         &ctx.accounts.token_1_program.to_account_info(),
         &[
-            POOL_VAULT_SEED.as_bytes(),
+            POOL_VAULT_SEED,
             ctx.accounts.pool_state.key().as_ref(),
             ctx.accounts.token_1_mint.key().as_ref(),
             &[ctx.bumps.token_1_vault][..],
@@ -308,7 +308,7 @@ pub fn initialize(
         liquidity
             .checked_sub(lock_lp_amount)
             .ok_or(ErrorCode::InitLpAmountTooLess)?,
-        &[&[crate::AUTH_SEED.as_bytes(), &[ctx.bumps.authority]]],
+        &[&[crate::AUTH_SEED, &[ctx.bumps.authority]]],
     )?;
 
     // Charge the fee to create a pool
@@ -371,7 +371,7 @@ pub fn create_pool<'info>(
 
     let (expect_pda_address, bump) = Pubkey::find_program_address(
         &[
-            POOL_SEED.as_bytes(),
+            POOL_SEED,
             amm_config.key().as_ref(),
             token_0_mint.key().as_ref(),
             token_1_mint.key().as_ref(),
@@ -389,7 +389,7 @@ pub fn create_pool<'info>(
         system_program.to_account_info(),
         pool_account_info.clone(),
         &[
-            POOL_SEED.as_bytes(),
+            POOL_SEED,
             amm_config.key().as_ref(),
             token_0_mint.key().as_ref(),
             token_1_mint.key().as_ref(),

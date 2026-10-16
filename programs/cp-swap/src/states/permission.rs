@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
 
-pub const PERMISSION_SEED: &str = "permission";
+#[constant]
+pub const PERMISSION_SEED: &[u8] = b"permission";
 
 /// Holds the current owner of the factory
 #[account]

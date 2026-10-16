@@ -17,7 +17,7 @@ pub struct ClosePermissionPda<'info> {
     #[account(
         mut,
         seeds = [
-            PERMISSION_SEED.as_bytes(),
+            PERMISSION_SEED,
             permission_authority.key().as_ref()
         ],
         bump,

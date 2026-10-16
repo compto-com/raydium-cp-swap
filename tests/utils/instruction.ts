@@ -13,6 +13,8 @@ import {
   TOKEN_PROGRAM_ID,
   TOKEN_2022_PROGRAM_ID,
   getAssociatedTokenAddressSync,
+  getOrCreateAssociatedTokenAccount,
+  NATIVE_MINT,
 } from "@solana/spl-token";
 import {
   accountExist,
@@ -277,8 +279,17 @@ export async function initialize(
     initAmount0: new BN(10000000000),
     initAmount1: new BN(20000000000),
   },
-  createPoolFee = new PublicKey("DNXgeM9EiiaAbaWvwjHj9fQQLAX5ZsfHyvmYUNRAdNC8")
+  createPoolFee?: PublicKey
 ) {
+  if (!createPoolFee) {
+    const creatorWsolAccount = await getOrCreateAssociatedTokenAccount(
+      program.provider.connection,
+      creator,
+      NATIVE_MINT,
+      creator.publicKey
+    );
+    createPoolFee = creatorWsolAccount.address;
+  }
   const [auth] = await getAuthAddress(program.programId);
   const [poolAddress] = await getPoolAddress(
     configAddress,

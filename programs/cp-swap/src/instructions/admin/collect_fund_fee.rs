@@ -15,7 +15,7 @@ pub struct CollectFundFee<'info> {
     /// CHECK: pool vault and lp mint authority
     #[account(
         seeds = [
-            crate::AUTH_SEED.as_bytes(),
+            crate::AUTH_SEED,
         ],
         bump,
     )]
@@ -100,7 +100,7 @@ pub fn collect_fund_fee(
         },
         amount_0,
         ctx.accounts.vault_0_mint.decimals,
-        &[&[crate::AUTH_SEED.as_bytes(), &[auth_bump]]],
+        &[&[crate::AUTH_SEED, &[auth_bump]]],
     )?;
 
     transfer_from_pool_vault_to_user(
@@ -115,7 +115,7 @@ pub fn collect_fund_fee(
         },
         amount_1,
         ctx.accounts.vault_1_mint.decimals,
-        &[&[crate::AUTH_SEED.as_bytes(), &[auth_bump]]],
+        &[&[crate::AUTH_SEED, &[auth_bump]]],
     )?;
 
     Ok(())

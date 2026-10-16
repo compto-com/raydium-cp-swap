@@ -3,9 +3,12 @@ use anchor_lang::prelude::*;
 use anchor_spl::token_interface::Mint;
 use std::ops::{BitAnd, BitOr, BitXor};
 /// Seed to derive account address and signature
-pub const POOL_SEED: &str = "pool";
-pub const POOL_LP_MINT_SEED: &str = "pool_lp_mint";
-pub const POOL_VAULT_SEED: &str = "pool_vault";
+#[constant]
+pub const POOL_SEED: &[u8] = b"pool";
+#[constant]
+pub const POOL_LP_MINT_SEED: &[u8] = b"pool_lp_mint";
+#[constant]
+pub const POOL_VAULT_SEED: &[u8] = b"pool_vault";
 
 pub const Q32: u128 = (u32::MAX as u128) + 1; // 2^32
 
