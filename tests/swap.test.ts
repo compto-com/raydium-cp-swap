@@ -255,12 +255,12 @@ describe("zero fees test", () => {
       outputTokenProgram
     );
 
-    const [inputVaultAddr] = await getPoolVaultAddress(
+    const [inputVaultAddr] = getPoolVaultAddress(
       poolAddress,
       inputToken,
       program.programId
     );
-    const [outputVaultAddr] = await getPoolVaultAddress(
+    const [outputVaultAddr] = getPoolVaultAddress(
       poolAddress,
       outputToken,
       program.programId

@@ -241,7 +241,7 @@ describe("collect excess lamports test", () => {
       "processed",
       TOKEN_PROGRAM_ID
     );
-    const [authority] = await getAuthAddress(program.programId);
+    const [authority] = getAuthAddress(program.programId);
     assert.equal(lpMintAfter.mintAuthority!.toBase58(), authority.toBase58());
     assert.equal(lpMintAfter.supply.toString(), lpMintBefore.supply.toString());
   });
@@ -250,7 +250,7 @@ describe("collect excess lamports test", () => {
     if (!mainnetTokenProgram) this.skip();
 
     const connection = anchor.getProvider().connection;
-    const [authority] = await getAuthAddress(program.programId);
+    const [authority] = getAuthAddress(program.programId);
     // pass a keypair so the account is a plain (non-associated) token account,
     // the associated path cannot derive an address for an off-curve owner.
     // wrap 1 SOL, so the account has a real wrapped balance to preserve.
