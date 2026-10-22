@@ -35,9 +35,8 @@ describe("collect excess lamports test", () => {
     skipPreflight: true,
   };
 
-  // the legacy-token cases need the mainnet token program (p-token); replace
-  // the surfnet's bundled build before any transaction runs (this file is
-  // alphabetically first), a mid-suite swap leaves the surfnet inconsistent
+  // the legacy-token cases need the p-token build of the token program, which
+  // only recent surfnets bundle
   let mainnetTokenProgram = false;
   before(async () => {
     mainnetTokenProgram = await ensureMainnetTokenProgram(
