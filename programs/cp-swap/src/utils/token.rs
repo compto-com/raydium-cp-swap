@@ -312,7 +312,7 @@ pub fn support_mint_associated_is_initialized(
         return Ok(false);
     }
     let (expect_mint_associated, __bump) = Pubkey::find_program_address(
-        &[SUPPORT_MINT_SEED.as_bytes(), token_mint.key().as_ref()],
+        &[SUPPORT_MINT_SEED, token_mint.key().as_ref()],
         &crate::id(),
     );
     let mut mint_associated_is_initialized = false;

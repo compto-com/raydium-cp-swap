@@ -13,6 +13,8 @@ import {
   TOKEN_PROGRAM_ID,
   TOKEN_2022_PROGRAM_ID,
   getAssociatedTokenAddressSync,
+  getOrCreateAssociatedTokenAccount,
+  NATIVE_MINT,
 } from "@solana/spl-token";
 import {
   accountExist,
@@ -236,10 +238,7 @@ export async function createAmmConfig(
   creator_fee_rate: BN,
   confirmOptions?: ConfirmOptions
 ): Promise<PublicKey> {
-  const [address, _] = await getAmmConfigAddress(
-    config_index,
-    program.programId
-  );
+  const [address, _] = getAmmConfigAddress(config_index, program.programId);
   if (await accountExist(connection, address)) {
     return address;
   }
@@ -277,29 +276,27 @@ export async function initialize(
     initAmount0: new BN(10000000000),
     initAmount1: new BN(20000000000),
   },
-  createPoolFee = new PublicKey("DNXgeM9EiiaAbaWvwjHj9fQQLAX5ZsfHyvmYUNRAdNC8")
+  createPoolFee?: PublicKey
 ) {
-  const [auth] = await getAuthAddress(program.programId);
-  const [poolAddress] = await getPoolAddress(
+  if (!createPoolFee) {
+    const creatorWsolAccount = await getOrCreateAssociatedTokenAccount(
+      program.provider.connection,
+      creator,
+      NATIVE_MINT,
+      creator.publicKey
+    );
+    createPoolFee = creatorWsolAccount.address;
+  }
+  const [auth] = getAuthAddress(program.programId);
+  const [poolAddress] = getPoolAddress(
     configAddress,
     token0,
     token1,
     program.programId
   );
-  const [lpMintAddress] = await getPoolLpMintAddress(
-    poolAddress,
-    program.programId
-  );
-  const [vault0] = await getPoolVaultAddress(
-    poolAddress,
-    token0,
-    program.programId
-  );
-  const [vault1] = await getPoolVaultAddress(
-    poolAddress,
-    token1,
-    program.programId
-  );
+  const [lpMintAddress] = getPoolLpMintAddress(poolAddress, program.programId);
+  const [vault0] = getPoolVaultAddress(poolAddress, token0, program.programId);
+  const [vault1] = getPoolVaultAddress(poolAddress, token1, program.programId);
   const [creatorLpTokenAddress] = PublicKey.findProgramAddressSync(
     [
       creator.publicKey.toBuffer(),
@@ -309,7 +306,7 @@ export async function initialize(
     ASSOCIATED_PROGRAM_ID
   );
 
-  const [observationAddress] = await getOrcleAccountAddress(
+  const [observationAddress] = getOrcleAccountAddress(
     poolAddress,
     program.programId
   );
@@ -367,29 +364,18 @@ export async function deposit(
   maximum_token_1_amount: BN,
   confirmOptions?: ConfirmOptions
 ) {
-  const [auth] = await getAuthAddress(program.programId);
-  const [poolAddress] = await getPoolAddress(
+  const [auth] = getAuthAddress(program.programId);
+  const [poolAddress] = getPoolAddress(
     configAddress,
     token0,
     token1,
     program.programId
   );
 
-  const [lpMintAddress] = await getPoolLpMintAddress(
-    poolAddress,
-    program.programId
-  );
-  const [vault0] = await getPoolVaultAddress(
-    poolAddress,
-    token0,
-    program.programId
-  );
-  const [vault1] = await getPoolVaultAddress(
-    poolAddress,
-    token1,
-    program.programId
-  );
-  const [ownerLpToken] = await PublicKey.findProgramAddress(
+  const [lpMintAddress] = getPoolLpMintAddress(poolAddress, program.programId);
+  const [vault0] = getPoolVaultAddress(poolAddress, token0, program.programId);
+  const [vault1] = getPoolVaultAddress(poolAddress, token1, program.programId);
+  const [ownerLpToken] = PublicKey.findProgramAddressSync(
     [
       owner.publicKey.toBuffer(),
       TOKEN_PROGRAM_ID.toBuffer(),
@@ -445,29 +431,18 @@ export async function withdraw(
   minimum_token_1_amount: BN,
   confirmOptions?: ConfirmOptions
 ) {
-  const [auth] = await getAuthAddress(program.programId);
-  const [poolAddress] = await getPoolAddress(
+  const [auth] = getAuthAddress(program.programId);
+  const [poolAddress] = getPoolAddress(
     configAddress,
     token0,
     token1,
     program.programId
   );
 
-  const [lpMintAddress] = await getPoolLpMintAddress(
-    poolAddress,
-    program.programId
-  );
-  const [vault0] = await getPoolVaultAddress(
-    poolAddress,
-    token0,
-    program.programId
-  );
-  const [vault1] = await getPoolVaultAddress(
-    poolAddress,
-    token1,
-    program.programId
-  );
-  const [ownerLpToken] = await PublicKey.findProgramAddress(
+  const [lpMintAddress] = getPoolLpMintAddress(poolAddress, program.programId);
+  const [vault0] = getPoolVaultAddress(poolAddress, token0, program.programId);
+  const [vault1] = getPoolVaultAddress(poolAddress, token1, program.programId);
+  const [ownerLpToken] = PublicKey.findProgramAddressSync(
     [
       owner.publicKey.toBuffer(),
       TOKEN_PROGRAM_ID.toBuffer(),
@@ -525,20 +500,20 @@ export async function swap_base_input(
   minimum_amount_out: BN,
   confirmOptions?: ConfirmOptions
 ) {
-  const [auth] = await getAuthAddress(program.programId);
-  const [poolAddress] = await getPoolAddress(
+  const [auth] = getAuthAddress(program.programId);
+  const [poolAddress] = getPoolAddress(
     configAddress,
     inputToken,
     outputToken,
     program.programId
   );
 
-  const [inputVault] = await getPoolVaultAddress(
+  const [inputVault] = getPoolVaultAddress(
     poolAddress,
     inputToken,
     program.programId
   );
-  const [outputVault] = await getPoolVaultAddress(
+  const [outputVault] = getPoolVaultAddress(
     poolAddress,
     outputToken,
     program.programId
@@ -556,7 +531,7 @@ export async function swap_base_input(
     false,
     outputTokenProgram
   );
-  const [observationAddress] = await getOrcleAccountAddress(
+  const [observationAddress] = getOrcleAccountAddress(
     poolAddress,
     program.programId
   );
@@ -596,8 +571,8 @@ export async function swap_base_output(
   confirmOptions?: ConfirmOptions,
   poolAddress?: PublicKey
 ) {
-  const [auth] = await getAuthAddress(program.programId);
-  const [poolPdaAddress] = await getPoolAddress(
+  const [auth] = getAuthAddress(program.programId);
+  const [poolPdaAddress] = getPoolAddress(
     configAddress,
     inputToken,
     outputToken,
@@ -606,12 +581,12 @@ export async function swap_base_output(
   if (poolAddress == undefined) {
     poolAddress = poolPdaAddress;
   }
-  const [inputVault] = await getPoolVaultAddress(
+  const [inputVault] = getPoolVaultAddress(
     poolAddress,
     inputToken,
     program.programId
   );
-  const [outputVault] = await getPoolVaultAddress(
+  const [outputVault] = getPoolVaultAddress(
     poolAddress,
     outputToken,
     program.programId
@@ -629,7 +604,7 @@ export async function swap_base_output(
     false,
     outputTokenProgram
   );
-  const [observationAddress] = await getOrcleAccountAddress(
+  const [observationAddress] = getOrcleAccountAddress(
     poolAddress,
     program.programId
   );
@@ -662,7 +637,7 @@ export async function collectExcessLamports(
   sourceLamportsAccounts: PublicKey[],
   confirmOptions?: ConfirmOptions
 ) {
-  const [auth] = await getAuthAddress(program.programId);
+  const [auth] = getAuthAddress(program.programId);
 
   const tx = await program.methods
     .collectExcessLamports()

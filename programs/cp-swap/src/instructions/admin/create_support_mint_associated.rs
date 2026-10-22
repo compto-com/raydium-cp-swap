@@ -29,7 +29,7 @@ pub struct CreateSupportMintAssociated<'info> {
     #[account(
         init,
         seeds = [
-            SUPPORT_MINT_SEED.as_bytes(),
+            SUPPORT_MINT_SEED,
             token_mint.key().as_ref(),
         ],
         bump,

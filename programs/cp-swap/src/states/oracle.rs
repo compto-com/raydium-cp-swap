@@ -5,7 +5,8 @@ use anchor_lang::prelude::*;
 #[cfg(test)]
 use std::time::{SystemTime, UNIX_EPOCH};
 /// Seed to derive account address and signature
-pub const OBSERVATION_SEED: &str = "observation";
+#[constant]
+pub const OBSERVATION_SEED: &[u8] = b"observation";
 // Number of ObservationState element
 pub const OBSERVATION_NUM: usize = 100;
 pub const OBSERVATION_UPDATE_DURATION_DEFAULT: u64 = 15;

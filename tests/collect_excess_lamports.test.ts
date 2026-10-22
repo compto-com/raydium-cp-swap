@@ -35,17 +35,8 @@ describe("collect excess lamports test", () => {
     skipPreflight: true,
   };
 
-  // collect_excess_lamports gates its signer on crate::admin::ID /
-  // crate::collect_lamports::ID — production keys on a stock build.
-  // `yarn test:local-admin` builds with `--features localnet` and compiles the
-  // local wallet in as admin so the admin cases below can sign as admin;
-  // otherwise they are skipped.
-  const adminIsLocalWallet =
-    process.env.CPSWAP_LOCALNET_ADMIN === owner.publicKey.toBase58();
-
-  // the legacy-token cases need the mainnet token program (p-token); replace
-  // the surfnet's bundled build before any transaction runs (this file is
-  // alphabetically first), a mid-suite swap leaves the surfnet inconsistent
+  // the legacy-token cases need the p-token build of the token program, which
+  // only recent surfnets bundle
   let mainnetTokenProgram = false;
   before(async () => {
     mainnetTokenProgram = await ensureMainnetTokenProgram(
@@ -119,8 +110,6 @@ describe("collect excess lamports test", () => {
   }
 
   it("collect excess lamports from token2022 vault and pool state", async function () {
-    if (!adminIsLocalWallet) this.skip();
-
     const { poolAddress, poolState } = await setupPool();
     // the default setup creates one legacy token mint and one token2022 mint
     const vault2022 = poolState.token0Program.equals(TOKEN_PROGRAM_ID)
@@ -156,8 +145,6 @@ describe("collect excess lamports test", () => {
   });
 
   it("collect excess lamports, account with zero excess does not stop processing later accounts", async function () {
-    if (!adminIsLocalWallet) this.skip();
-
     const { poolAddress, poolState } = await setupPool();
 
     // observation state is freshly created, i.e. exactly at the rent-exempt
@@ -196,7 +183,7 @@ describe("collect excess lamports test", () => {
   it("collect excess lamports from legacy token vault", async function () {
     // the mainnet legacy token program (p-token) supports
     // WithdrawExcessLamports, the build bundled with local validators does not
-    if (!adminIsLocalWallet || !mainnetTokenProgram) this.skip();
+    if (!mainnetTokenProgram) this.skip();
 
     const { poolState } = await setupPool();
     const vaultLegacy = poolState.token0Program.equals(TOKEN_PROGRAM_ID)
@@ -216,7 +203,7 @@ describe("collect excess lamports test", () => {
   it("collect excess lamports from the pool lp mint, mixed with a vault and a pda", async function () {
     // the lp mint is created with the legacy token program, so this needs the
     // mainnet build (p-token) that supports WithdrawExcessLamports
-    if (!adminIsLocalWallet || !mainnetTokenProgram) this.skip();
+    if (!mainnetTokenProgram) this.skip();
 
     const { poolAddress, poolState } = await setupPool();
     const lpMint = poolState.lpMint;
@@ -253,16 +240,16 @@ describe("collect excess lamports test", () => {
       "processed",
       TOKEN_PROGRAM_ID
     );
-    const [authority] = await getAuthAddress(program.programId);
+    const [authority] = getAuthAddress(program.programId);
     assert.equal(lpMintAfter.mintAuthority!.toBase58(), authority.toBase58());
     assert.equal(lpMintAfter.supply.toString(), lpMintBefore.supply.toString());
   });
 
   it("collect excess lamports from a native (WSOL) account, wrapped balance unchanged", async function () {
-    if (!adminIsLocalWallet || !mainnetTokenProgram) this.skip();
+    if (!mainnetTokenProgram) this.skip();
 
     const connection = anchor.getProvider().connection;
-    const [authority] = await getAuthAddress(program.programId);
+    const [authority] = getAuthAddress(program.programId);
     // pass a keypair so the account is a plain (non-associated) token account,
     // the associated path cannot derive an address for an off-curve owner.
     // wrap 1 SOL, so the account has a real wrapped balance to preserve.

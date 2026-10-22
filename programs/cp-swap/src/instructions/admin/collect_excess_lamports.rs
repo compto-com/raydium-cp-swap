@@ -15,7 +15,7 @@ pub struct CollectExcessLamports<'info> {
     /// CHECK: pool vault and lp mint authority
     #[account(
         seeds = [
-            crate::AUTH_SEED.as_bytes(),
+            crate::AUTH_SEED,
         ],
         bump,
     )]
@@ -41,7 +41,7 @@ pub fn collect_excess_lamports<'info>(
                 source_lamports_account.to_account_info(),
                 ctx.accounts.collect_lamports_wallet.to_account_info(),
                 ctx.accounts.authority.to_account_info(),
-                crate::AUTH_SEED.as_bytes(),
+                crate::AUTH_SEED,
                 ctx.bumps.authority,
             )?;
         } else if *source_lamports_account.owner == Token2022::id() {
@@ -50,7 +50,7 @@ pub fn collect_excess_lamports<'info>(
                 source_lamports_account.to_account_info(),
                 ctx.accounts.collect_lamports_wallet.to_account_info(),
                 ctx.accounts.authority.to_account_info(),
-                crate::AUTH_SEED.as_bytes(),
+                crate::AUTH_SEED,
                 ctx.bumps.authority,
             )?;
         } else if *source_lamports_account.owner == crate::id() {

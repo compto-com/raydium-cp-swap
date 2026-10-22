@@ -140,7 +140,7 @@ pub fn swap_base_output(
         ctx.accounts.output_token_program.to_account_info(),
         output_transfer_amount,
         ctx.accounts.output_token_mint.decimals,
-        &[&[crate::AUTH_SEED.as_bytes(), &[pool_state.auth_bump]]],
+        &[&[crate::AUTH_SEED, &[pool_state.auth_bump]]],
     )?;
 
     // update the previous price to the observation

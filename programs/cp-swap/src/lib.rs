@@ -8,70 +8,73 @@ use anchor_lang::prelude::*;
 use instructions::*;
 pub use states::CreatorFeeOn;
 
-#[cfg(not(feature = "no-entrypoint"))]
-solana_security_txt::security_txt! {
-    name: "raydium-cp-swap",
-    project_url: "https://raydium.io",
-    contacts: "link:https://immunefi.com/bounty/raydium",
-    policy: "https://immunefi.com/bounty/raydium",
-    source_code: "https://github.com/raydium-io/raydium-cp-swap",
-    preferred_languages: "en",
-    auditors: "https://github.com/raydium-io/raydium-docs/blob/master/audit/MadShield%20Q1%202024/raydium-cp-swap-v-1.0.0.pdf"
-}
-
-#[cfg(feature = "devnet")]
-declare_id!("DRaycpLY18LhpbydsBWbVJtxpNv9oXPgjRSfpF2bWpYb");
-#[cfg(not(feature = "devnet"))]
-declare_id!("CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C");
+declare_id!("GVSzpfu4CzCxgU7wNeNy4eCeDX6R7ecY3vKSRLuDJfu1");
 
 pub mod admin {
+    use super::{constant, Pubkey};
+
     #[cfg(not(feature = "localnet"))]
     use super::pubkey;
-    use super::Pubkey;
+
     #[cfg(feature = "localnet")]
     pub const ID: Pubkey = Pubkey::from_str_const(env!(
         "CPSWAP_LOCALNET_ADMIN",
-        "the `localnet` feature needs CPSWAP_LOCALNET_ADMIN=<admin pubkey> at build time (run `yarn test:local-admin`)"
+        "the `localnet` feature needs CPSWAP_LOCALNET_ADMIN=<admin pubkey> at build time (run `yarn test`)"
     ));
-    #[cfg(feature = "devnet")]
-    pub const ID: Pubkey = pubkey!("DRayqG9RXYi8WHgWEmRQGrUWRWbhjYWYkCRJDd6JBBak");
-    #[cfg(all(not(feature = "devnet"), not(feature = "localnet")))]
-    pub const ID: Pubkey = pubkey!("GThUX1Atko4tqhN2NaiTazWSeFWMuiUvfFnyJyUghFMJ");
+    #[cfg(not(feature = "localnet"))]
+    pub const ID: Pubkey = pubkey!("AvLfQNWrZGKtNtTts54vu7Bh7ib6Kg2boTSszviofZit");
+
+    #[constant]
+    pub const ADMIN: Pubkey = ID;
 }
 
-pub mod create_pool_fee_reveiver {
-    use super::{pubkey, Pubkey};
-    #[cfg(feature = "devnet")]
-    pub const ID: Pubkey = pubkey!("3oE58BKVt8KuYkGxx8zBojugnymWmBiyafWgMrnb6eYy");
-    #[cfg(not(feature = "devnet"))]
-    pub const ID: Pubkey = pubkey!("DNXgeM9EiiaAbaWvwjHj9fQQLAX5ZsfHyvmYUNRAdNC8");
+pub mod create_pool_fee_receiver {
+    use super::{constant, Pubkey};
+
+    #[cfg(not(feature = "localnet"))]
+    use super::pubkey;
+
+    #[cfg(feature = "localnet")]
+    pub const ID: Pubkey = Pubkey::from_str_const(env!(
+        "CPSWAP_LOCALNET_CREATE_POOL_FEE_RECEIVER",
+        "the `localnet` feature needs CPSWAP_LOCALNET_CREATE_POOL_FEE_RECEIVER=<wsol token account pubkey> at build time (run `yarn test`)"
+    ));
+    #[cfg(not(feature = "localnet"))]
+    pub const ID: Pubkey = pubkey!("CDsQikWYLCS5gwHcuKeMR87YZXcxs7JAhPGNCMzkzx1j");
+
+    #[constant]
+    pub const CREATE_POOL_FEE_RECEIVER: Pubkey = ID;
 }
 
 pub mod collect_lamports {
-    use super::{pubkey, Pubkey};
-    #[cfg(feature = "devnet")]
-    pub const ID: Pubkey = pubkey!("DRaydJNq54dSDHUqYCE3G8YySgaXfZucbh7dTXw9fBMs");
-    #[cfg(not(feature = "devnet"))]
-    pub const ID: Pubkey = pubkey!("RayGkhY93thaTgCv98sx1pNLgBHhJDxWUeZXp4bjmnp");
+    use super::{constant, pubkey, Pubkey};
+
+    pub const ID: Pubkey = pubkey!("7nAGdBN2KCP4g81XSqsxkoEo6auy33ygf4NsxY5w9jdN");
+
+    #[constant]
+    pub const COLLECT_LAMPORTS: Pubkey = ID;
 }
 
 pub mod fund_fee_owner {
-    use super::{pubkey, Pubkey};
-    #[cfg(feature = "devnet")]
-    pub const ID: Pubkey = pubkey!("DRay33UmULQCeawH3dVpJfN3uqLj6Qtq4ymSRx2pAgGK");
-    #[cfg(not(feature = "devnet"))]
-    pub const ID: Pubkey = pubkey!("FUNDduJTA7XcckKHKfAoEnnhuSud2JUCUZv6opWEjrBU");
+    use super::{constant, pubkey, Pubkey};
+
+    pub const ID: Pubkey = pubkey!("6Pe5RkDCSBKTRTExBAaAdWe46WQk2E7U9n3w2q7j44Jr");
+
+    #[constant]
+    pub const FUND_FEE_OWNER: Pubkey = ID;
 }
 
 pub mod protocol_fee_owner {
-    use super::{pubkey, Pubkey};
-    #[cfg(feature = "devnet")]
-    pub const ID: Pubkey = pubkey!("DRay33UmULQCeawH3dVpJfN3uqLj6Qtq4ymSRx2pAgGK");
-    #[cfg(not(feature = "devnet"))]
-    pub const ID: Pubkey = pubkey!("ProCXqRcXJjoUd1RNoo28bSizAA6EEqt9wURZYPDc5u");
+    use super::{constant, pubkey, Pubkey};
+
+    pub const ID: Pubkey = pubkey!("7AecDu3RmpeNuu8oyVgcrL6mhzBBNKpXnoicUqFDG6Yr");
+
+    #[constant]
+    pub const PROTOCOL_FEE_OWNER: Pubkey = ID;
 }
 
-pub const AUTH_SEED: &str = "vault_and_lp_mint_auth_seed";
+#[constant]
+pub const AUTH_SEED: &[u8] = b"vault_and_lp_mint_auth_seed";
 
 #[program]
 pub mod raydium_cp_swap {
