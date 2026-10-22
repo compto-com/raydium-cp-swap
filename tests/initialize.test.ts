@@ -24,18 +24,12 @@ describe("initialize test", () => {
   };
 
   // the create-pool fee is transferred to the local wallet's wsol ATA
-  // (crate::create_pool_fee_reveiver::ID, injected at build time via
+  // (crate::create_pool_fee_receiver::ID, injected at build time via
   // CPSWAP_LOCALNET_CREATE_POOL_FEE_RECEIVER) and synced into its wrapped amount
   const createPoolFeeReceiver = getAssociatedTokenAddressSync(
     NATIVE_MINT,
     owner.publicKey
   );
-
-  // creating an amm config is admin-gated, `yarn test:local-admin` compiles the
-  // local wallet in as admin; without it there is no way to get a config that
-  // differs from the mainnet ones cloned into the validator
-  const adminIsLocalWallet =
-    process.env.CPSWAP_LOCALNET_ADMIN === owner.publicKey.toBase58();
 
   before(async () => {
     await getOrCreateAssociatedTokenAccount(
@@ -57,9 +51,6 @@ describe("initialize test", () => {
   }
 
   it("create pool without fee", async function () {
-    // amm config 0 is cloned from mainnet and carries a real create_pool_fee, so
-    // the zero-fee path needs a config of its own; index 1000 is unused onchain
-    if (!adminIsLocalWallet) this.skip();
     const { configAddress, token0, token0Program, token1, token1Program } =
       await setupInitializeTest(
         program,

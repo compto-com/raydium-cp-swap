@@ -44,8 +44,8 @@ Clone the repository and test the program.
 
 ```shell
 
-git clone https://github.com/raydium-io/raydium-cp-swap
-cd raydium-cp-swap && yarn && anchor test
+git clone https://github.com/compto-com/raydium-cp-swap
+cd raydium-cp-swap && yarn && yarn test
 ```
 
 ## License

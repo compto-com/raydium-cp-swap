@@ -19,7 +19,7 @@ pub mod admin {
     #[cfg(feature = "localnet")]
     pub const ID: Pubkey = Pubkey::from_str_const(env!(
         "CPSWAP_LOCALNET_ADMIN",
-        "the `localnet` feature needs CPSWAP_LOCALNET_ADMIN=<admin pubkey> at build time (run `yarn test:local-admin`)"
+        "the `localnet` feature needs CPSWAP_LOCALNET_ADMIN=<admin pubkey> at build time (run `yarn test`)"
     ));
     #[cfg(not(feature = "localnet"))]
     pub const ID: Pubkey = pubkey!("AvLfQNWrZGKtNtTts54vu7Bh7ib6Kg2boTSszviofZit");
@@ -37,7 +37,7 @@ pub mod create_pool_fee_receiver {
     #[cfg(feature = "localnet")]
     pub const ID: Pubkey = Pubkey::from_str_const(env!(
         "CPSWAP_LOCALNET_CREATE_POOL_FEE_RECEIVER",
-        "the `localnet` feature needs CPSWAP_LOCALNET_CREATE_POOL_FEE_RECEIVER=<wsol token account pubkey> at build time (run `yarn test:local-admin`)"
+        "the `localnet` feature needs CPSWAP_LOCALNET_CREATE_POOL_FEE_RECEIVER=<wsol token account pubkey> at build time (run `yarn test`)"
     ));
     #[cfg(not(feature = "localnet"))]
     pub const ID: Pubkey = pubkey!("CDsQikWYLCS5gwHcuKeMR87YZXcxs7JAhPGNCMzkzx1j");

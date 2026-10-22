@@ -211,17 +211,7 @@ describe("zero fees test", () => {
     skipPreflight: true,
   };
 
-  // creating a new amm config (needed here for zero fee rates) gates its
-  // signer on crate::admin::ID — a production key on a stock build.
-  // `yarn test:local-admin` builds with `--features localnet` and compiles
-  // the local wallet in as admin so these cases can sign as admin;
-  // otherwise they are skipped.
-  const adminIsLocalWallet =
-    process.env.CPSWAP_LOCALNET_ADMIN === owner.publicKey.toBase58();
-
   it("swap base input with zero fees transfers the full amount and accrues no fees", async function () {
-    if (!adminIsLocalWallet) this.skip();
-
     const { configAddress, poolAddress, poolState } = await setupSwapTest(
       program,
       anchor.getProvider().connection,
@@ -341,8 +331,6 @@ describe("zero fees test", () => {
   });
 
   it("swap base output with zero fees transfers exactly the requested output and accrues no fees", async function () {
-    if (!adminIsLocalWallet) this.skip();
-
     const { configAddress, poolAddress, poolState } = await setupSwapTest(
       program,
       anchor.getProvider().connection,
@@ -412,8 +400,6 @@ describe("zero fees test", () => {
   });
 
   it("supports a configured creator fee rate on a pool where creator fees are disabled", async function () {
-    if (!adminIsLocalWallet) this.skip();
-
     // pools initialize with enable_creator_fee = false, which forces the
     // effective creator_fee_rate to 0 (see adjust_creator_fee_rate) regardless
     // of the ammConfig's creatorFeeRate. This is the same all-zero-rate,
