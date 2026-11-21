@@ -25,13 +25,13 @@ import {
 } from "@solana/spl-token";
 import { sendTransaction } from "./index";
 
-// create a token mint and a token2022 mint with transferFeeConfig
+// create a legacy token mint and a token2022 mint (with a transfer fee if
+// `transferFeeConfig` is given), sorted into pool order
 export async function createTokenMintAndAssociatedTokenAccount(
   connection: Connection,
   payer: Signer,
   mintAuthority: Signer,
-  transferFeeConfig: { transferFeeBasisPoints: number; MaxFee: number },
-  allToken2022?: boolean
+  transferFeeConfig: { transferFeeBasisPoints: number; MaxFee: number } | null
 ): Promise<
   [
     { token0: PublicKey; token0Program: PublicKey },
@@ -54,33 +54,33 @@ export async function createTokenMintAndAssociatedTokenAccount(
   }
 
   let tokenArray: Token[] = [];
-  if (allToken2022) {
-    let token0 = await createMintWithTransferFee(
-      connection,
-      payer,
-      mintAuthority,
-      Keypair.generate(),
-      transferFeeConfig
-    );
-    tokenArray.push({ address: token0, program: TOKEN_2022_PROGRAM_ID });
-  } else {
-    let token0 = await createMint(
-      connection,
-      mintAuthority,
-      mintAuthority.publicKey,
-      null,
-      9
-    );
-    tokenArray.push({ address: token0, program: TOKEN_PROGRAM_ID });
-  }
-
-  let token1 = await createMintWithTransferFee(
+  let token0 = await createMint(
     connection,
-    payer,
     mintAuthority,
-    Keypair.generate(),
-    transferFeeConfig
+    mintAuthority.publicKey,
+    null,
+    9
   );
+  tokenArray.push({ address: token0, program: TOKEN_PROGRAM_ID });
+
+  let token1 = transferFeeConfig
+    ? await createMintWithTransferFee(
+        connection,
+        payer,
+        mintAuthority,
+        Keypair.generate(),
+        transferFeeConfig
+      )
+    : await createMint(
+        connection,
+        mintAuthority,
+        mintAuthority.publicKey,
+        null,
+        9,
+        Keypair.generate(),
+        undefined,
+        TOKEN_2022_PROGRAM_ID
+      );
 
   tokenArray.push({ address: token1, program: TOKEN_2022_PROGRAM_ID });
 
@@ -107,7 +107,7 @@ export async function createTokenMintAndAssociatedTokenAccount(
     return 0;
   });
 
-  let token0 = tokenArray[0].address;
+  token0 = tokenArray[0].address;
   token1 = tokenArray[1].address;
   //   console.log("Token 0", token0.toString());
   //   console.log("Token 1", token1.toString());

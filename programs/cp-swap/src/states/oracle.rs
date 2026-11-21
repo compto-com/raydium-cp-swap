@@ -29,7 +29,6 @@ impl Observation {
 
 #[account(zero_copy(unsafe))]
 #[repr(C, packed)]
-#[cfg_attr(feature = "client", derive(Debug))]
 pub struct ObservationState {
     /// Whether the ObservationState is initialized
     pub initialized: bool,
