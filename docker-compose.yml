@@ -30,7 +30,7 @@
 services:
   solana-dev:
     build: .
-    image: raydium-cpmm-dev:anchor-v1.0.2-surfpool
+    image: raydium-cpmm-dev:anchor-v1.0.2
     container_name: raydium-cpmm-dev
     volumes:
       - .:/workspace

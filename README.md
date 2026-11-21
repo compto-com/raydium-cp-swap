@@ -1,15 +1,16 @@
 # raydium-cp-swap
 
-A revamped constant product AMM program optimized for straightforward pool deployment along with additional features and integrations:
+Compto's stripped-down fork of Raydium's constant product AMM. Each deployment holds exactly one pool:
 
-- No Openbook market ID is required for pool creation
-- Token22 is supported
-- Built-in price oracle
-- Optimized in Anchor
+- **One pool**, created once by the admin at a fixed PDA (`[POOL_SEED]`)
+- **Zero fees**: swaps follow pure `x * y = k`, with no trade, protocol, fund, creator or pool-creation fees
+- **Permanent liquidity**: the liquidity supplied at `initialize` can never be withdrawn, and there are no LP tokens
+- Token-2022 mints are supported, except mints with the transfer-fee extension, which `initialize` rejects so no swap ever pays a fee
+- Built-in TWAP price oracle
 
-The program has been audited by [MadShield](https://www.madshield.xyz/). The report can be found [here](https://github.com/raydium-io/raydium-docs/tree/master/audit/MadShield%20Q1%202024).
+Instructions: `initialize`, `swap_base_input`, `swap_base_output`.
 
-The program assets are in-scope for Raydium’s [Immunefi bug bounty program](https://immunefi.com/bug-bounty/raydium/).
+This fork diverges heavily from the upstream program, so Raydium's audit and bug bounty do not cover it.
 
 ## Environment Setup
 
